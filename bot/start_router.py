@@ -3,11 +3,11 @@ import logging
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from aiogram.utils.keyboard import InlineKeyboardBuilder
-from aiogram.types import InlineKeyboardButton
 
 from db.controller import DbController
 from db.models import User
+
+from bot.keyboard_builder import Builder
 
 logger = logging.getLogger(__name__)
 
@@ -26,14 +26,11 @@ async def command_start_handler(message: Message) -> None:
             )
         )
 
-    builder = InlineKeyboardBuilder()
-    builder.row(
-        InlineKeyboardButton(text='test1', callback_data='test1'),
-        InlineKeyboardButton(text="test2", callback_data="test2")
+    builder = Builder.get_keyboard(
+        storage,
+        user.user_id,
     )
-    builder.row(
-        InlineKeyboardButton(text='test3', url='https://www.google.com')
-    )
+
     await message.answer(
         f"Hello, {message.from_user.full_name}!",
         reply_markup=builder.as_markup(),

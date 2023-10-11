@@ -1,9 +1,10 @@
 from datetime import datetime
-from pydantic import BaseModel, field_validator
+from enum import Enum
+from pydantic import BaseModel
 from typing import Optional
 
 
-class MapLeaf(BaseModel):
+class Leaf(BaseModel):
     leaf_id: int
     user_id: int
     name: str
@@ -20,6 +21,20 @@ class MapLeaf(BaseModel):
 class User(BaseModel):
     user_id: int
     username: Optional[str] = ''
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class UserAction(Enum):
+    view = 1
+    edit = 2
+    add = 3
+
+
+class UserState(BaseModel):
+    user_id: int
+    state: int
+    action: UserAction
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

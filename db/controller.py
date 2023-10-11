@@ -1,15 +1,16 @@
 import logging
-import typing
+from typing import Dict, List
 import sqlite3
 
-from db.models import User
+from db.user_queries import UserQueriesMixin
+from db.models import Leaf
 
 
 logger = logging.getLogger(__name__)
 
 
-class DbController:
-    DB_PARAMS: typing.Dict[str, str]
+class DbController(UserQueriesMixin):
+    DB_PARAMS: Dict[str, str]
     db_filename: str = 'storage.db'
 
     def __init__(self):
@@ -28,39 +29,40 @@ class DbController:
 
         return conn
 
-    def write_user(self, user: User):
-        logger.info(f'Write user {user.user_id}')
+    def get_leaves(self, user_id: int, parent_id: int) -> List[Leaf]:
+        logger.debug(
+            f'Get leaves with parent_id {parent_id} for user {user_id}'
+        )
 
         conn = self._get_connection()
-
         sql = f"""
-        INSERT INTO users (
-            `user_id`,
-            `username`
-        ) VALUES (
-            '{user.user_id}',
-            '{user.username}'
-        );
+        SELECT * FROM leaves 
+        WHERE user_id={user_id} AND parent_id={parent_id};
         """
 
         cur = conn.cursor()
         cur.execute(sql)
         conn.commit()
 
-    def get_user(self, user_id: int):
-        logger.info(f'Fetch user {user_id}')
+        rows = cur.fetchall()
+        leaves = []
 
-        conn = self._get_connection()
-        sql = f'SELECT * from users WHERE user_id={user_id};'
+        for row in rows:
+            leaves.append(
+                Leaf(
+                    leaf_id=row[0],
+                    user_id=row[1],
+                    name=row[2],
+                    parent_id=row[3],
+                    target_value=row[4],
+                    current_value=row[5],
+                    deadline=row[6],
+                    created_at=row[7],
+                    updated_at=row[8],
+                )
+            )
 
-        cur = conn.cursor()
-        cur.execute(sql)
-        conn.commit()
-
-        row = cur.fetchone()
-
-        logger.info(row)
-        return row
+        return leaves
 
     def _create_tables(self):
         logger.info('Creating tables')
@@ -91,6 +93,17 @@ class DbController:
             CREATE TABLE IF NOT EXISTS users (
                 `user_id`                   INTEGER PRIMARY KEY,
                 `username`                  TEXT,
+                `created_at`                DATETIME DEFAULT current_timestamp,
+                `updated_at`                DATETIME DEFAULT current_timestamp
+            );
+            """
+            cur.execute(sql)
+
+            sql = """
+            CREATE TABLE IF NOT EXISTS user_state (
+                `user_id`                   INTEGER PRIMARY KEY,
+                `state`                     INTEGER,
+                `action`                    INTEGER,
                 `created_at`                DATETIME DEFAULT current_timestamp,
                 `updated_at`                DATETIME DEFAULT current_timestamp
             );
