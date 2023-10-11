@@ -9,3 +9,5 @@ __pycache__/
 
 config.py
 **/config.py
+
+*.db
