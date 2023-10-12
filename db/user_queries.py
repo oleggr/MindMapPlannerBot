@@ -44,12 +44,15 @@ class UserQueriesMixin:
 
         row = cur.fetchone()
 
-        return User(
-            user_id=row[0],
-            username=row[1],
-            created_at=row[2],
-            updated_at=row[3],
-        )
+        if row:
+            return User(
+                user_id=row[0],
+                username=row[1],
+                created_at=row[2],
+                updated_at=row[3],
+            )
+
+        return False
 
     def upsert_user_state(self, user_state: UserState):
         logger.debug(f'Upsert user state {user_state.user_id}')

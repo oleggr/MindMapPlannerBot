@@ -9,6 +9,7 @@ from db.controller import DbController
 logger = logging.getLogger(__name__)
 
 DEFAULT_STATE = 0
+DEFAULT_NAME = 'default'
 
 
 class Builder:
@@ -19,9 +20,10 @@ class Builder:
             storage: DbController,
             user_id: int,
             state: int = DEFAULT_STATE,
+            parent_state: int = DEFAULT_STATE,
     ) -> InlineKeyboardBuilder:
         logger.debug(
-            f'Build basic keyboard user {user_id}, state {state}'
+            f'Build keyboard user {user_id}, state {state}, parent_state {parent_state}'
         )
 
         leaves = storage.get_leaves(
@@ -37,6 +39,7 @@ class Builder:
                 callback_data=StateCallbackFactory(
                     action='view',
                     state=leaf.leaf_id,
+                    name=leaf.name,
                     parent_state=state,
                 ),
             )
@@ -52,9 +55,7 @@ class Builder:
                 callback_data=StateCallbackFactory(action='settings', state=state),
             )
         else:
-            _parent_state = 0
-            if leaves:
-                _parent_state = leaves[0].parent_id
+            _parent_state = parent_state
 
             builder.button(
                 text='<<<',

@@ -28,7 +28,7 @@ async def command_start_handler(message: Message) -> None:
 
     builder = Builder.get_keyboard(
         storage,
-        user.user_id,
+        message.from_user.id,
     )
 
     await message.answer(
