@@ -39,7 +39,7 @@ class UserQueriesMixin:
         conn = self._get_connection()
 
         sql = f"""
-        INSERT INTO users (
+        INSERT INTO user_messages (
             `user_id`,
             `message`
         ) VALUES (

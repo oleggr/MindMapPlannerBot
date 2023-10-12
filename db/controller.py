@@ -65,7 +65,7 @@ class DbController(UserQueriesMixin, LeafQueriesMixin):
             cur.execute(sql)
 
             sql = """
-            CREATE TABLE IF NOT EXISTS users (
+            CREATE TABLE IF NOT EXISTS user_messages (
                 `user_id`                   INTEGER PRIMARY KEY,
                 `message`                   TEXT,
                 `created_at`                DATETIME DEFAULT current_timestamp
