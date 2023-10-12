@@ -9,7 +9,6 @@ from db.controller import DbController
 logger = logging.getLogger(__name__)
 
 DEFAULT_STATE = 0
-DEFAULT_NAME = 'default'
 
 
 class Builder:

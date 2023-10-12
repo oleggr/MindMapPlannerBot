@@ -8,6 +8,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 from bot.callback_data import StateCallbackFactory
 from bot.keyboard_builder import Builder
+from bot.message_builder import MessageBuilder
 from db.controller import DbController
 
 
@@ -15,6 +16,8 @@ logger = logging.getLogger(__name__)
 
 main_router = Router()
 storage = DbController()
+
+DEFAULT_STATE = 0
 
 
 @main_router.callback_query(StateCallbackFactory.filter(F.action == "settings"))
@@ -31,7 +34,7 @@ async def show_bot_settings(
 
     with suppress(TelegramBadRequest):
         await callback.message.edit_text(
-            f'Скоро тут будут {hbold("настройки")}',
+            f'{hbold("Settings")} will appear here {hbold("soon")}',
             reply_markup=builder.as_markup(),
         )
 
@@ -47,14 +50,24 @@ async def backward_to_parent_leaf(
         f'Call action BACK for user {callback.from_user.id}, '
         f'state {callback_data.state}, parent_state {callback_data.parent_state}'
     )
+    message = 'default'
+
+    if callback_data.parent_state == DEFAULT_STATE:
+        message = MessageBuilder.get_start_message()
+
+    leaf = storage.get_leaf_by_id(callback_data.parent_state)
+    if leaf:
+        message = leaf.name
+
     builder = Builder.get_keyboard(
         storage=storage,
         user_id=callback.from_user.id,
         state=callback_data.parent_state,
+        parent_state=leaf.parent_id if leaf else DEFAULT_STATE
     )
 
     await callback.message.edit_text(
-        'Test',
+        message,
         reply_markup=builder.as_markup(),
     )
 

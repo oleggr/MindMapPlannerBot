@@ -1,7 +1,8 @@
 import logging
-from typing import Dict, List
+from typing import Dict
 import sqlite3
 
+from db.leaf_queries import LeafQueriesMixin
 from db.user_queries import UserQueriesMixin
 from db.models import Leaf
 
@@ -9,7 +10,7 @@ from db.models import Leaf
 logger = logging.getLogger(__name__)
 
 
-class DbController(UserQueriesMixin):
+class DbController(UserQueriesMixin, LeafQueriesMixin):
     DB_PARAMS: Dict[str, str]
     db_filename: str = 'storage.db'
 
@@ -28,41 +29,6 @@ class DbController(UserQueriesMixin):
             print(e)
 
         return conn
-
-    def get_leaves(self, user_id: int, parent_id: int) -> List[Leaf]:
-        logger.debug(
-            f'Get leaves with parent_id {parent_id} for user {user_id}'
-        )
-
-        conn = self._get_connection()
-        sql = f"""
-        SELECT * FROM leaves 
-        WHERE user_id={user_id} AND parent_id={parent_id};
-        """
-
-        cur = conn.cursor()
-        cur.execute(sql)
-        conn.commit()
-
-        rows = cur.fetchall()
-        leaves = []
-
-        for row in rows:
-            leaves.append(
-                Leaf(
-                    leaf_id=row[0],
-                    user_id=row[1],
-                    name=row[2],
-                    parent_id=row[3],
-                    target_value=row[4],
-                    current_value=row[5],
-                    deadline=row[6],
-                    created_at=row[7],
-                    updated_at=row[8],
-                )
-            )
-
-        return leaves
 
     def _create_tables(self):
         logger.info('Creating tables')

@@ -1,5 +1,6 @@
-import logging
 from datetime import datetime
+import logging
+from typing import Optional
 
 from db.models import User, UserState
 
@@ -32,7 +33,7 @@ class UserQueriesMixin:
         cur.execute(sql)
         conn.commit()
 
-    def get_user(self, user_id: int):
+    def get_user(self, user_id: int) -> Optional[User]:
         logger.debug(f'Fetch user {user_id}')
 
         conn = self._get_connection()
@@ -51,8 +52,6 @@ class UserQueriesMixin:
                 created_at=row[2],
                 updated_at=row[3],
             )
-
-        return False
 
     def upsert_user_state(self, user_state: UserState):
         logger.debug(f'Upsert user state {user_state.user_id}')
@@ -81,7 +80,7 @@ class UserQueriesMixin:
         cur.execute(sql)
         conn.commit()
 
-    def get_user_state(self, user_id: int):
+    def get_user_state(self, user_id: int) -> Optional[UserState]:
         logger.debug(f'Fetch user state {user_id}')
 
         conn = self._get_connection()
@@ -93,10 +92,11 @@ class UserQueriesMixin:
 
         row = cur.fetchone()
 
-        return User(
-            user_id=row[0],
-            state=row[1],
-            action=row[2],
-            created_at=row[3],
-            updated_at=row[4],
-        )
+        if row:
+            return UserState(
+                user_id=row[0],
+                state=row[1],
+                action=row[2],
+                created_at=row[3],
+                updated_at=row[4],
+            )
