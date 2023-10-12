@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 from typing import Optional
 
-from db.models import User, UserState
+from db.models import User, UserState, UserMessage
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,25 @@ class UserQueriesMixin:
         ) VALUES (
             '{user.user_id}',
             '{user.username}'
+        );
+        """
+
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()
+
+    def write_message(self, user_message: UserMessage):
+        logger.debug(f'Write user message {user_message.user_id}')
+
+        conn = self._get_connection()
+
+        sql = f"""
+        INSERT INTO users (
+            `user_id`,
+            `message`
+        ) VALUES (
+            '{user_message.user_id}',
+            '{user_message.message}'
         );
         """
 
@@ -70,9 +89,9 @@ class UserQueriesMixin:
             '{user_state.state}',
             '{user_state.action}'
         ) ON CONFLICT do UPDATE SET
-            `state`={user_state.state},
-            `state`={user_state.action},
-            `updated_at`={user_state.updated_at}
+            state={user_state.state},
+            action={user_state.action},
+            updated_at='{user_state.updated_at}'
         ;
         """
 

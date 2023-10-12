@@ -8,6 +8,7 @@ from db.controller import DbController
 from db.models import User
 
 from bot.keyboard_builder import Builder
+from bot.message_builder import START_MESSAGE
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,6 @@ async def command_start_handler(message: Message) -> None:
     )
 
     await message.answer(
-        f"Hello, {message.from_user.full_name}!",
+        START_MESSAGE,
         reply_markup=builder.as_markup(),
     )

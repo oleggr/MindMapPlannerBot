@@ -1,4 +1,3 @@
-from datetime import datetime
 import logging
 from typing import List, Optional
 
@@ -21,14 +20,12 @@ class LeafQueriesMixin:
 
         sql = f"""
         INSERT INTO leaves (
-            `leaf_id`,
             `user_id`,
             `name`,
             `parent_id`,
             `target_value`,
-            `current_value`,
+            `current_value`
         ) VALUES (
-            '{leaf.leaf_id}',
             '{leaf.user_id}',
             '{leaf.name}',
             '{leaf.parent_id}',
@@ -36,6 +33,17 @@ class LeafQueriesMixin:
             '{leaf.current_value}'
         );
         """
+
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()
+
+    def update_leaf(self, leaf_id: int, leaf_name: str):
+        logger.debug(f'Update leaf name {leaf_id}')
+
+        conn = self._get_connection()
+
+        sql = f"UPDATE leaves SET name='{leaf_name}' WHERE leaf_id={leaf_id};"
 
         cur = conn.cursor()
         cur.execute(sql)

@@ -27,14 +27,18 @@ class User(BaseModel):
 
 class UserAction(Enum):
     view = 1
-    edit = 2
-    add = 3
+    edit_name = 2
+    add_name = 3
 
 
 class UserState(BaseModel):
     user_id: int
     state: int
-    action: UserAction
+    action: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
+
+class UserMessage(BaseModel):
+    user_id: int
+    message: str

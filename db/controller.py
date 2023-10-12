@@ -4,7 +4,6 @@ import sqlite3
 
 from db.leaf_queries import LeafQueriesMixin
 from db.user_queries import UserQueriesMixin
-from db.models import Leaf
 
 
 logger = logging.getLogger(__name__)
@@ -61,6 +60,15 @@ class DbController(UserQueriesMixin, LeafQueriesMixin):
                 `username`                  TEXT,
                 `created_at`                DATETIME DEFAULT current_timestamp,
                 `updated_at`                DATETIME DEFAULT current_timestamp
+            );
+            """
+            cur.execute(sql)
+
+            sql = """
+            CREATE TABLE IF NOT EXISTS users (
+                `user_id`                   INTEGER PRIMARY KEY,
+                `message`                   TEXT,
+                `created_at`                DATETIME DEFAULT current_timestamp
             );
             """
             cur.execute(sql)

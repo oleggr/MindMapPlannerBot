@@ -1,6 +1,7 @@
 import logging
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from bot.callback_data import StateCallbackFactory
 from db.controller import DbController
@@ -42,6 +43,11 @@ class Builder:
                     parent_state=state,
                 ),
             )
+
+        builder.button(
+            text='Edit',
+            callback_data=StateCallbackFactory(action='edit', state=state),
+        )
 
         builder.button(
             text='Add',
@@ -94,3 +100,17 @@ class Builder:
         )
 
         return builder
+
+    @staticmethod
+    def get_skip_button():
+        kb = [
+            [
+                KeyboardButton(text="Skip"),
+            ],
+        ]
+        keyboard = ReplyKeyboardMarkup(
+            keyboard=kb,
+            resize_keyboard=True,
+        )
+
+        return keyboard
