@@ -142,7 +142,7 @@ async def view_leaf(
 
     await callback.message.answer(
         EDIT_TOPIC,
-        reply_markup=Builder.get_skip_button(),
+        reply_markup=Builder.get_edit_menu(),
     )
     await callback.answer()
 
@@ -157,13 +157,6 @@ async def handle_message(message: Message) -> None:
 
     if user_state.state == DEFAULT_STATE:
         _message = START_MESSAGE
-
-    builder = Builder.get_keyboard(
-        storage=storage,
-        user_id=user_id,
-        state=user_state.state,
-        parent_state=_parent_state,
-    )
 
     if user_state.action == UserAction.add_name.value:
         storage.write_leaf(
@@ -185,6 +178,13 @@ async def handle_message(message: Message) -> None:
             )
         )
 
+        builder = Builder.get_keyboard(
+            storage=storage,
+            user_id=user_id,
+            state=user_state.state,
+            parent_state=_parent_state,
+        )
+
         leaf = storage.get_leaf_by_id(user_state.state)
         if leaf:
             _message = leaf.name
@@ -196,7 +196,9 @@ async def handle_message(message: Message) -> None:
         )
 
     elif user_state.action == UserAction.edit_name.value:
-        if message.text != 'Skip' and user_state.state != DEFAULT_STATE:
+        if message.text != 'Skip' \
+                and message.text != 'Delete' \
+                and user_state.state != DEFAULT_STATE:
             storage.update_leaf(user_state.state, message.text)
 
         storage.upsert_user_state(
@@ -211,6 +213,29 @@ async def handle_message(message: Message) -> None:
         if leaf:
             _message = leaf.name
             _parent_state = leaf.parent_id
+
+        _state = user_state.state
+
+        if message.text == 'Delete':
+            storage.delete_leaf(user_state.state)
+            _state = DEFAULT_STATE
+
+            if _parent_state == DEFAULT_STATE:
+                _message = START_MESSAGE
+                _parent_state = DEFAULT_STATE
+
+            parent_leaf = storage.get_leaf_by_id(_parent_state)
+            if parent_leaf:
+                _message = parent_leaf.name
+                _state = parent_leaf.leaf_id
+                _parent_state = parent_leaf.parent_id
+
+        builder = Builder.get_keyboard(
+            storage=storage,
+            user_id=user_id,
+            state=_state,
+            parent_state=_parent_state,
+        )
 
         await message.answer(
             _message,

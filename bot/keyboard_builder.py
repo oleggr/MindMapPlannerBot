@@ -45,11 +45,6 @@ class Builder:
             )
 
         builder.button(
-            text='Edit',
-            callback_data=StateCallbackFactory(action='edit', state=state),
-        )
-
-        builder.button(
             text='Add',
             callback_data=StateCallbackFactory(action='add', state=state),
         )
@@ -60,6 +55,11 @@ class Builder:
                 callback_data=StateCallbackFactory(action='settings', state=state),
             )
         else:
+            builder.button(
+                text='Edit',
+                callback_data=StateCallbackFactory(action='edit', state=state),
+            )
+
             _parent_state = parent_state
 
             builder.button(
@@ -102,10 +102,13 @@ class Builder:
         return builder
 
     @staticmethod
-    def get_skip_button():
+    def get_edit_menu():
         kb = [
             [
                 KeyboardButton(text="Skip"),
+            ],
+            [
+                KeyboardButton(text="Delete"),
             ],
         ]
         keyboard = ReplyKeyboardMarkup(

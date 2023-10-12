@@ -66,7 +66,8 @@ class DbController(UserQueriesMixin, LeafQueriesMixin):
 
             sql = """
             CREATE TABLE IF NOT EXISTS user_messages (
-                `user_id`                   INTEGER PRIMARY KEY,
+                'message_id'                INTEGER PRIMARY KEY,
+                `user_id`                   INTEGER,
                 `message`                   TEXT,
                 `created_at`                DATETIME DEFAULT current_timestamp
             );
