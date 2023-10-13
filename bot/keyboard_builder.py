@@ -10,6 +10,7 @@ from db.controller import DbController
 logger = logging.getLogger(__name__)
 
 DEFAULT_STATE = 0
+BUTTONS_IN_ROW = 1
 
 
 class Builder:
@@ -71,6 +72,8 @@ class Builder:
                 ),
             )
 
+        builder.adjust(BUTTONS_IN_ROW)
+
         return builder
 
     @staticmethod
@@ -98,6 +101,8 @@ class Builder:
                 parent_state=parent_state
             ),
         )
+
+        builder.adjust(BUTTONS_IN_ROW)
 
         return builder
 
